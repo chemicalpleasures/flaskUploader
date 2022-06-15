@@ -1,0 +1,3 @@
+config.py
+/static/excel_files/downloads/*
+/static/excel_files/uploads/*
