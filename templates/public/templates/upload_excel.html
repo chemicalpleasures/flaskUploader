@@ -1,0 +1,29 @@
+{% extends "public/templates/public_template.html" %}
+
+{% block title %}Upload{%  endblock %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Home</h1>
+            <hr>
+
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Select .XLSX File</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" name="excel" id="excel">
+                        <label class="custom-file-label" for="excel">Select .XLSX...</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Upload XLSX file</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
