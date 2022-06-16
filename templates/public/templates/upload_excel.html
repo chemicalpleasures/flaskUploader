@@ -7,19 +7,22 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <h1>Home</h1>
+            <h1>Target Error Parser</h1>
+            <p><em>AKA Dylan's Data Cleaner™</em></p>
             <hr>
-
+            <!-- TARGET XLSX UPLOADER --!>
             <form action="/" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label>Select .XLSX File</label>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" name="excel" id="excel">
-                        <label class="custom-file-label" for="excel">Select .XLSX...</label>
+                    <label>Select <b>Target</b> Inventory .XLSX File <em>(Should be named "inv.xlsx")</em></label>
+                    <div class="input-group mb-3">
+                      <input type="file" class="form-control" id="inputGroupFile01" name="target_excel" id="target_excel">
+                    </div>
+                    <label>Select <b>Salsify</b> Inventory .XLSX File <em>(Should be named "inv.xlsx")</em></label>
+                    <div class="input-group mb-3">
+                      <input type="file" class="form-control" id="inputGroupFile01" name="sals_excel" id="sals_excel">
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary">Upload XLSX file</button>
+                <button type="submit" class="btn btn-primary">Upload XLSX files</button>
             </form>
         </div>
     </div>

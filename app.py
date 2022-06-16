@@ -25,18 +25,31 @@ def allowed_excel(filename):
 @app.route('/',  methods=["GET", "POST"])
 def upload_excel():
     if request.method == "POST":
-        if request.files["excel"]:
-            excel = request.files["excel"]
-            if excel.filename == "":
+        if request.files["target_excel"]:
+            target_excel = request.files["target_excel"]
+            if target_excel.filename == "":
                 print("Must have a filename")
                 return redirect(request.url)
-            if not allowed_excel(excel.filename):
+            if not allowed_excel(target_excel.filename):
                 print("File extension is not allowed")
                 return redirect(request.url)
             else:
-                filename = secure_filename(excel.filename)
-                excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
-            print("Excel File Saved")
+                filename = secure_filename(target_excel.filename)
+                target_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+            print("Target Excel File Saved")
+
+            if request.files["sals_excel"]:
+                sals_excel = request.files["sals_excel"]
+                if sals_excel.filename == "":
+                    print("Must have a filename")
+                    return redirect(request.url)
+                if not allowed_excel(sals_excel.filename):
+                    print("File extension is not allowed")
+                    return redirect(request.url)
+                else:
+                    filename = secure_filename(sals_excel.filename)
+                    sals_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+                print("Salsify Excel File Saved")
             return redirect(request.url)
     return render_template("public/templates/upload_excel.html")
 
