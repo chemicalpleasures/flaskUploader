@@ -3,7 +3,6 @@ import os
 from werkzeug.utils import secure_filename
 import pandas as pd
 import openpyxl
-from boto.s3.connection import S3Connection
 
 # setting config vars for Heroku
 xlsx_uploads = os.environ['EXCEL_UPLOADS']
