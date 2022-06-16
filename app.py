@@ -7,14 +7,8 @@ import openpyxl
 
 app = Flask(__name__)
 
-"""
-string:
-int:
-float:
-path:
-uuid:
-"""
 
+# Specifies allowed filetypes (see environment vars)
 def allowed_excel(filename):
     if not "." in filename:
         return False
@@ -24,7 +18,9 @@ def allowed_excel(filename):
     else:
         return False
 
-@app.route('/',  methods=["GET", "POST"])
+
+# Handler for excel file uploads or whatever else
+@app.route('/', methods=["GET", "POST"])
 def upload_excel():
     if request.method == "POST":
         if request.files["target_excel"]:
@@ -55,80 +51,150 @@ def upload_excel():
             return redirect(request.url)
     return render_template("public/templates/upload_excel.html")
 
-@app.route('/parser', methods=['POST', 'GET'])
-def parser():
-    if request.method == "POST":
-        # defines datasets. wb is the list of Target errors from the target portal. wb2 is product data from salsify.
-        wb = 'static/excel_files/uploads/target.xlsx'
-        wb2 = 'static/excel_files/uploads/inv.xlsx'
 
-        df1 = pd.read_excel(wb)
-        df2 = pd.read_excel(wb2)
+@app.route('/get-orders', methods=['POST', 'GET'])
+# Refreshes API key and stores in env variable. Need to link to a button
+def refreshToken():
+    url = "https://api.channeladvisor.com/oauth2/token"
 
-        # renames first column
-        df1.rename(columns={"Partner SKU": "Inventory Number"}, inplace=True)
+    auth_str = '{}:{}'.format(config.app_id, config.shared_secret)
+    b64_auth_str = base64.urlsafe_b64encode(auth_str.encode()).decode()
 
-        merge = pd.merge(df1, df2, how="left", on="Inventory Number")
+    payload = 'grant_type=refresh_token&refresh_token=' + config.refresh_token
+    headers = {
+        'Authorization': 'Basic ' + b64_auth_str,
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
 
-        # removes unwanted columns
-        merge.drop(['Barcode', 'TCIN', 'Published', 'Error Code'], axis=1, inplace=True)
+    response = requests.request("POST", url, headers=headers, data=payload)
 
-        # creates condition which removes all product statuses and reasons we don't want
-        cond1 = (merge["Product Status (Computed)"] == "Resourcing - Quality/Defective") | (
-                    merge["Product Status (Computed)"] == "Resourcing - Margin Too Low") | (
-                            merge["Product Status (Computed)"] == "Resourcing - Product Elevation In Progress") | (
-                            merge["Product Status (Computed)"] == "Resourcing - Vendor Relation") | (
-                            merge["Product Status (Computed)"] == "Resourcing") | (
-                            merge["Item Type"] == "Powered Riding Toys") | (
-                            merge["Reason"] == "Image might be considered to be RACY") | (
-                            merge["Reason"] == "Field may contain suggestive and/or profane language.") | (
-                            merge["Reason"] == "Illustrations/Logos are not acceptable images.") | (
-                            merge["Reason"] == "Image may be a drawing.") | (
-                            merge["Reason"] == "Image might be considered to be ADULT") | (
-                            merge["Reason"] == "Image might be considered to be SPOOF") | (
-                            merge["Reason"] == "Image might be considered to be MEDICAL") | (
-                            merge["Reason"] == "Field may reference a weapon.") | (
-                            merge["Reason"] == "Field may reference alcohol.") | (merge[
-                                                                                      "Reason"] == "Field may indicate that the item does not comply with Target's inclusive merchandising policy") | (
-                            merge["Reason"] == "This field is inherited from its parent and has errors") | (
-                            merge["Reason"] == "This field is inherited from its parent and has errors") | (
-                            merge["Reason"] == "The product was in a terminal state when the parent was versioned") | (
-                            merge["Reason"] == "This item was put into suspended state")
+    print(response.text)
+    token_json = json.loads(response.text)
+    print(token_json['access_token'])
 
-        # creates condition which removes "Do Not Reorder" skus that are <= 130 qty
-        cond2 = merge["Product Status (Computed)"].isin(
-            ["Do Not Reorder – Exclude from Shopify", "Do Not Reorder – Safety Issue",
-             "Do Not Reorder - Keep on ALL Marketplaces"]) & (merge["Total Quantity"] <= 130)
+    f = open("config2.py", "w")
+    f.write("refreshed_token = \"" + token_json['access_token'] + "\"")
+    f.close()
 
-        # create dataframes containing all SKUs which meet conditions
-        df3 = merge[cond1]
-        df4 = merge[cond2]
 
-        # concatenates all filtered data, removes duplicates
-        df_all_rows = pd.concat([df3, df4]).drop_duplicates().reset_index(drop=True)
+# Main script. Gets unshipped orders from ChAd API. Output should be displayed on the page
+def getOrders():
+    if request.method == "GET":
+        r = requests.get(
+            "https://api.channeladvisor.com/v1/Orders?$filter=ShippingStatus eq 'Unshipped' and ProfileID eq 32001378&access_token=" + config2.refreshed_token)
+        list_of_attributes = r.text
+        attributes = json.loads(list_of_attributes)
 
-        # remove filtered SKUs from original dataset based on SKU + Reason
-        unsorted = pd.merge(merge, df_all_rows, on=['Inventory Number', 'Reason'], how='left', indicator=True).query(
-            "_merge != 'both'").drop('_merge', axis=1).drop(
-            ['Product Title_y', 'Inventory_y', 'Data Update Status_y', 'Last Item Update_y', 'Error Category_y',
-             'Partner Field Value_y', 'Submitted Field Name_y', 'Field Name_y', 'Partner Action_y',
-             'Product Status (Computed)_y', 'Total Quantity_y', 'salsify:parent_id_y', 'Item Type_y'],
-            axis=1).reset_index(drop=True)
+        # Converts API response to JSON
+        with open("data.json", "w") as write:
+            json.dump(attributes, write)
 
-        # sort by parent ID
-        final = unsorted.sort_values(by=['Inventory Number'])
+        # Defines list variables
+        full_list = attributes["value"]
+        df = pd.DataFrame(full_list)
+        order_ids = df['ID']
+        order_data = []
+        sku_list = []
 
-        final.to_excel("static/excel_files/downloads/output.xlsx")
+        # Filters response and iterates through lists to retrieve each SKU
+        def retrieveOrderItems():
+            for x in order_ids:
+                order_items = requests.get("https://api.channeladvisor.com/v1/Orders(" + str(
+                    x) + ")/Items?$filter=ProfileID eq 32001378&access_token=" + config2.refreshed_token)
+                order_items_json = json.loads(order_items.text)
+                order_data.append(order_items_json["value"])
+            for list in order_data:
+                for sku in list:
+                    sku_list.append(sku)
+            df2 = pd.DataFrame(sku_list)
+            return df2
 
-    return render_template('public/templates/parser.html')
+        # Calls function and creates dataframe from returned data. Drops unnecessary columns
+        unshipped_skus = retrieveOrderItems()
+        unshipped_skus.drop(
+            ['ProductID', 'SiteOrderItemID', 'SellerOrderItemID', 'UnitPrice', 'TaxPrice', 'ShippingPrice',
+             'ShippingTaxPrice', 'RecyclingFee', 'UnitEstimatedShippingCost', 'GiftMessage', 'GiftNotes', 'GiftPrice',
+             'GiftTaxPrice', 'IsBundle', 'ItemURL', 'HarmonizedCode'], axis=1, inplace=True)
+        unshipped_skus.to_excel("ID data.xlsx", sheet_name="Sheet1")
 
+        # Loads entire ChannelAdvisor inventory and merges based on SKU. Outputs to Activewear Upload.xlsx
+        chad_inv = pd.read_excel('chad_inv.xlsx')
+        activewear_skus = pd.merge(unshipped_skus, chad_inv, how='left', on='Sku')
+        print(activewear_skus)
+        activewear_skus.to_excel("Activewear Upload.xlsx", sheet_name="Sheet1")
+
+    return render_template('public/templates/get-orders.html')
+
+
+# Converts orders to JSON which SSActivewear can read
+def ConvertOrders():
+    df = pd.read_excel('Activewear Upload.xlsx')
+
+    # Drops all rows that have no ActiveWear SKU and extraneous columns
+    df2 = df.dropna(subset=['Attribute1Value'])
+    df2.drop(
+        ['ID', 'ProfileID', 'OrderID', 'SiteListingID', 'Title', 'Classification', 'Attribute1Name', 'Unnamed: 0'],
+        axis=1, inplace=True)
+    df2.reset_index(drop=True, inplace=True)
+
+    # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+    #     print(df2)
+
+    # creates JSON object to send to SSActivewear. Does a lot of reformatting of the DataFrame object and converts to JSON
+    df2.drop(['Sku', 'Attribute2Value', 'Attribute2Name'], axis=1, inplace=True)
+    df2.rename(columns={'Quantity': 'qty', 'Attribute1Value': 'identifier'}, inplace=True)
+    df2 = df2[['identifier', 'qty']]
+    order = df2.to_json('orders.json', orient="records")
+
+
+# Submits final order to SSActivewear
+def submitOrder():
+    f = open('orders.json')
+    lines = json.load(f)
+
+    url = "https://api.ssactivewear.com/v2/orders/"
+
+    payload = json.dumps({
+        "shippingAddress": {
+            "customer": "Company ABC",
+            "attn": "John Doe",
+            "address": "123 Main St",
+            "city": "Bolingbrook",
+            "state": "IL",
+            "zip": "60440",
+            "residential": True
+        },
+        "shippingMethod": "1",
+        "shipBlind": False,
+        "poNumber": "Online Test",
+        "RejectLineErrors": "false",
+        "emailConfirmation": "aforkbends@gmail.com",
+        "rejectLineErrors_Email": "true",
+        "testOrder": True,
+        "autoselectWarehouse": True,
+        "lines": lines
+    })
+    headers = {
+        'Authorization': 'Basic ' + config.ssa_api_key,
+        'Content-Type': 'application/json',
+        'Cookie': '__cf_bm=_BOX3o_owW3dCpquJ8apGRYK0MUxc9DXLDbylhj55qo-1655413418-0-AVqP+NDYBun21+X5wUJWXech2e6q/YYoKCVhAhozg1Zrq93i49AF0Vu+DzOOjzvYBnadIyN0he92Ob3MVROG/bnVYnFkUxX2aqZiQYSGdBBw'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+
+
+# Handler for downloading excel files or whatever else
 @app.route('/get-excel/<excel_download>')
 def get_excel(excel_download):
     try:
-        return send_from_directory(directory=config.CLIENT_EXCELS, filename=excel_download, as_attachment=False, path='/')
+        return send_from_directory(directory=config.CLIENT_EXCELS, filename=excel_download, as_attachment=False,
+                                   path='/')
     except FileNotFoundError:
         abort(404)
     return "Ready for download"
+
 
 if __name__ == '__main__':
     app.run()

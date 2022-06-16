@@ -1,9 +1,3 @@
-Flask Uploader/Downloader
+ChAd Order App (Flask deploy)
 
-This should house the Target Error Parser or any other script that requires upload/download (perhaps the Order app).
-
-Ideas:
-1. Feedback for when upload is complete
-
-
-Tutorial here: https://www.youtube.com/watch?v=QjpbWAirMWw&list=PLF2JzgCW6-YY_TZCmBrbOpgx5pSNBD0_L&index=14
+This should work in the entire ChAd order app while creating a GUI for it using Flask.
