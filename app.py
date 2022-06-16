@@ -7,14 +7,6 @@ import openpyxl
 
 app = Flask(__name__)
 
-"""
-string:
-int:
-float:
-path:
-uuid:
-"""
-
 def allowed_excel(filename):
     if not "." in filename:
         return False
