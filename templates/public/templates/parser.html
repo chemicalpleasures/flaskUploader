@@ -1,0 +1,26 @@
+{% extends "public/templates/public_template.html" %}
+
+{% block title %}Upload{%  endblock %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Target Error Parser</h1>
+            <p><em>AKA Dylan's Data Cleaner™</em></p>
+
+            <hr>
+            <form action="/parser" method="POST">
+                <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="script" value="Run Script">Run the Parser</button>
+            </form>
+            <br>
+            <p>Once complete, <a href="/get-excel/output.xlsx">please right-click and save as here to download your file.</a></p>
+            <p>Or, <a href="/">start over from the beginning.</a></p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
