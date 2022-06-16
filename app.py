@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, send_from_directory, abort
 import os
 from werkzeug.utils import secure_filename
-import config
 import pandas as pd
 import openpyxl
 
