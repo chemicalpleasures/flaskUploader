@@ -3,6 +3,13 @@ import os
 from werkzeug.utils import secure_filename
 import pandas as pd
 import openpyxl
+from boto.s3.connection import S3Connection
+
+# setting config vars for Heroku
+xlsx_uploads = os.environ['EXCEL_UPLOADS']
+client_excels = os.environ['CLIENT_EXCELS']
+allowed_extensions = os.environ['ALLOWED_EXTENSIONS']
+
 
 app = Flask(__name__)
 
@@ -10,7 +17,7 @@ def allowed_excel(filename):
     if not "." in filename:
         return False
     ext = filename.rsplit(".", 1)[1]
-    if ext.upper() in config.ALLOWED_EXTENSIONS:
+    if ext.upper() in allowed_extensions:
         return True
     else:
         return False
@@ -28,7 +35,7 @@ def upload_excel():
                 return redirect(request.url)
             else:
                 filename = secure_filename(target_excel.filename)
-                target_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+                target_excel.save(os.path.join(xlsx_uploads, filename))
             print("Target Excel File Saved")
 
             if request.files["sals_excel"]:
@@ -41,7 +48,7 @@ def upload_excel():
                     return redirect(request.url)
                 else:
                     filename = secure_filename(sals_excel.filename)
-                    sals_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+                    sals_excel.save(os.path.join(xlsx_uploads, filename))
                 print("Salsify Excel File Saved")
             return redirect(request.url)
     return render_template("public/templates/upload_excel.html")
@@ -116,7 +123,7 @@ def parser():
 @app.route('/get-excel/<excel_download>')
 def get_excel(excel_download):
     try:
-        return send_from_directory(directory=config.CLIENT_EXCELS, filename=excel_download, as_attachment=False, path='/')
+        return send_from_directory(directory=client_excels, filename=excel_download, as_attachment=False, path='/')
     except FileNotFoundError:
         abort(404)
     return "Ready for download"
