@@ -1,11 +1,15 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, abort
+from flask import Flask, render_template, flash, request, redirect, send_from_directory, abort
 import os
 from werkzeug.utils import secure_filename
 import config
 import pandas as pd
+import base64
+import requests
+import json
 import openpyxl
 
 app = Flask(__name__)
+app.secret_key = config.SECRET_KEY
 
 
 # Specifies allowed filetypes (see environment vars)
@@ -75,6 +79,7 @@ def refreshToken():
     f = open("config2.py", "w")
     f.write("refreshed_token = \"" + token_json['access_token'] + "\"")
     f.close()
+    return render_template("public/templates/get-orders.html")
 
 
 # Main script. Gets unshipped orders from ChAd API. Output should be displayed on the page
@@ -194,6 +199,21 @@ def get_excel(excel_download):
     except FileNotFoundError:
         abort(404)
     return "Ready for download"
+
+
+@app.route("/sign-up", methods=["GET", "POST"])
+def sign_up():
+    if request.method == "POST":
+        req = request.form
+        username = req.get("username")
+        email = req.get("email")
+
+        if not len(email) >= 10:
+            flash("Email must be at least 10 characters ya bozo", "danger")
+            return redirect(request.url)
+        flash("Account created!", "success")
+        return redirect(request.url)
+    return render_template("public/templates/sign-up.html")
 
 
 if __name__ == '__main__':
