@@ -14,15 +14,6 @@
             <br>
            <!-- EXCEL REUPLOADER --!>
            <p>Once this process is complete, you can <a href="/static/excel/Activewear Upload.xlsx">download the excel file</a>, edit the quantities, and then reupload:
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <button class="btn btn-outline-secondary" type="button" name="activewear-excel">Upload</button>
-              </div>
-              <div class="custom-file">
-                <input type="file" class="custom-file-input" id="inputGroupFile03">
-                <label class="custom-file-label" for="inputGroupFile03">Choose file</label>
-              </div>
-            </div>
             <hr>
             <h1>Step 3: Convert Orders to S&S SKUs</h1>
             <p>Click this button to convert orders to S&S format</p>
@@ -32,6 +23,18 @@
             <p>Click this button to submit your order</p>
             <button type="submit" class="btn btn-primary" name="submit-order" value="submit-order">Submit Orders</button>
        </form>
+
+         <form action="/" method="POST" enctype="multipart/form-data" name="activewear-excel">
+           <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary" type="submit" name="activewear-excel">Upload</button>
+              </div>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="inputGroupFile03">
+                <label class="custom-file-label" for="inputGroupFile03">Choose file</label>
+              </div>
+            </div>
+        </form>
   </div>
   <script src="../../../static/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
