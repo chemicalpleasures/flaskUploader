@@ -6,6 +6,7 @@ import config2
 import pandas as pd
 import base64
 import requests
+from requests.auth import HTTPBasicAuth
 import json
 import openpyxl
 
@@ -134,12 +135,13 @@ def submitOrder():
         "shippingMethod": "1",
         "shipBlind": "false",
         "poNumber": "Online Test",
-        "emailConfirmation": "aforkbends@gmail.com",
-        "rejectLineErrors_Email": "false",
+        "emailConfirmation": "dubtrizzle@gmail.com",
+        "rejectLineErrors_Email": "true",
         "testOrder": "true",
         "RejectLineErrors": "false",
         "autoselectWarehouse": "true",
-        "autoselectWarehouse_Warehouses": "NV,TX",
+        "AutoSelectWarehouse_Preference": "fastest",
+        "autoselectWarehouse_Warehouses": "",
         "lines": lines
     }
     json_payload = json.dumps(payload)
@@ -168,7 +170,7 @@ def order_app():
         if "convert" in request.form:
             ConvertOrders()
             flash("Orders converted!", "success")
-        if "submit" in request.form:
+        if "submit-order" in request.form:
             submitOrder()
             flash("Order submitted!", "success")
     return render_template("public/templates/index.html")
