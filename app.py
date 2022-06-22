@@ -173,6 +173,19 @@ def order_app():
         if "submit-order" in request.form:
             submitOrder()
             flash("Order submitted!", "success")
+        if request.files["activewear-excel"]:
+            activewear_excel = request.files["activewear-excel"]
+            if target_excel.filename == "":
+                print("Must have a filename")
+                return redirect(request.url)
+            if not allowed_excel(activewear_excel.filename):
+                print("File extension is not allowed")
+                return redirect(request.url)
+            else:
+                filename = secure_filename(activewear_excel.filename)
+                activewear_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+            print("Activewear Excel File Saved")
+
     return render_template("public/templates/index.html")
 
 
