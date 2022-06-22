@@ -1,0 +1,26 @@
+{%  extends "public/templates/public_template.html" %}
+
+{% block title %}Get Orders{%  endblock %}
+  <div id="main">{% block main %}</div>
+  <div class ="container">
+       <form action="/get-orders" method="POST" name="refresh" id="refresh">
+            <h1>Step 1: Refresh Token</h1>
+            <p>Refresh this token. Token is good for approx one hour. </p>
+            <button type="submit" class="btn btn-primary" name="refresh" value="refresh">Refresh Token</button>
+            <hr>
+            <h1>Step 2: Download Orders from ChannelAdvisor</h1>
+            <p>Click this button to download orders from ChannelAdvisor </p>
+            <button type="submit" class="btn btn-primary" name="download" value="download">Get Orders</button>
+            <hr>
+            <h1>Step 3: Convert Orders to S&S SKUs</h1>
+            <p>Click this button to convert orders to S&S format</p>
+            <button type="submit" class="btn btn-primary" name="convert" value="convert">Get Orders</button>
+            <hr>
+            <h1>Step 4: Submit Order</h1>
+            <p>Click this button to submit your order</p>
+            <button type="submit" class="btn btn-primary" name="submit-order" value="submit-order">Get Orders</button>
+       </form>
+  </div>
+  <script src="../../../static/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "public/templates/public_template.html" %}
+
+{% block title %}Get Orders{%  endblock %}
+  <div id="main">{% block main %}</div>
+  <div class ="container">
+    <form action="/" method="POST" name="refresh" id="refresh">
+        <h1>Step 1: Refresh Token</h1>
+        <p>Refresh this token. Token is good for approx one hour. </p>
+        <button type="submit" class="btn btn-primary" name="refresh" value="refresh">Refresh Token</button>
+        <hr>
+        <h1>Step 2: Download Orders from ChannelAdvisor</h1>
+        <p>Click this button to download orders from ChannelAdvisor.</p>
+        <button type="submit" class="btn btn-primary" name="download" value="download">Get Orders</button>
+        <br>
+   <!-- EXCEL REUPLOADER --!>
+        <p>Once this process is complete, you can <a href="/static/excel/Activewear Upload.xlsx">download the excel file</a>, edit the quantities, and then reupload:
+   </form>
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Select <b>Activewear</b> Inventory .XLSX File <em>(Should be named "target.xlsx")</em></label>
+            <div class="input-group mb-3">
+              <input type="file" class="form-control" id="inputGroupFile01" name="activewear_excel" id="activewear_excel">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload XLSX files</button>
+    </form>
+    <hr>
+    <form action="/" method="POST" name="refresh" id="refresh">
+        <h1>Step 3: Convert Orders to S&S SKUs</h1>
+        <p>Click this button to convert orders to S&S format</p>
+        <button class="btn btn-primary" name="convert" value="convert">Convert Orders</button>
+        <hr>
+        <h1>Step 4: Submit Order</h1>
+        <p>Click this button to submit your order</p>
+        <button type="submit" class="btn btn-primary" name="submit-order" value="submit-order">Submit Orders</button>
+    </form>
+
+
+  </div>
+  <script src="../../../static/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+{% endblock %}

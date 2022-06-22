@@ -1,9 +1,14 @@
-Flask Uploader/Downloader
+ChAd Order App (Flask deploy)
 
-This should house the Target Error Parser or any other script that requires upload/download (perhaps the Order app).
+This should work in the entire ChAd order app while creating a GUI for it using Flask.
 
-Ideas:
-1. Feedback for when upload is complete
+Message flashing/notifications: https://www.youtube.com/watch?v=T1PLBEEZU8o
 
+Editable pandas dataframe for adjusting qtys: https://stackoverflow.com/questions/41470817/edit-pandas-dataframe-in-flask-html-page
 
-Tutorial here: https://www.youtube.com/watch?v=QjpbWAirMWw&list=PLF2JzgCW6-YY_TZCmBrbOpgx5pSNBD0_L&index=14
+Still needs:
+1. Unshipped order logic - don't order things that have already been ordered since last time
+2. Editable dataframe? Or at least an download/upload link to edit qtys manually in Excel
+3. Needs invoice date
+4. Filter out accessories? Whang? Other stuff?
+5. Input box for rejectLineErrors_Email	address - variable in JSON. Or send to multiple?
