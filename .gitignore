@@ -2,3 +2,5 @@ config.py
 config2.py
 /static/excel_files/downloads/*
 /static/excel_files/uploads/*
+/static/excel/orders.json
+/static/excel/Activewear Upload.xlsx

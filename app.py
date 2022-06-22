@@ -88,15 +88,15 @@ def getOrders():
     unshipped_skus.to_excel("ID data.xlsx", sheet_name="Sheet1")
 
     # Loads entire ChannelAdvisor inventory and merges based on SKU. Outputs to Activewear Upload.xlsx
-    chad_inv = pd.read_excel('chad_inv.xlsx')
+    chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
     activewear_skus = pd.merge(unshipped_skus, chad_inv, how='left', on='Sku')
     print(activewear_skus)
-    activewear_skus.to_excel("Activewear Upload.xlsx", sheet_name="Sheet1")
+    activewear_skus.to_excel("static/excel/Activewear Upload.xlsx", sheet_name="Sheet1")
 
 
 # Converts orders to JSON which SSActivewear can read
 def ConvertOrders():
-    df = pd.read_excel('Activewear Upload.xlsx')
+    df = pd.read_excel('static/excel/Activewear Upload.xlsx')
 
     # Drops all rows that have no ActiveWear SKU and extraneous columns
     df2 = df.dropna(subset=['Attribute1Value'])
@@ -112,43 +112,45 @@ def ConvertOrders():
     df2.drop(['Sku', 'Attribute2Value', 'Attribute2Name'], axis=1, inplace=True)
     df2.rename(columns={'Quantity': 'qty', 'Attribute1Value': 'identifier'}, inplace=True)
     df2 = df2[['identifier', 'qty']]
-    order = df2.to_json('orders.json', orient="records")
+    order = df2.to_json('static/excel/orders.json', orient="records")
 
 
 # Submits final order to SSActivewear
 def submitOrder():
-    f = open('orders.json')
+    f = open('static/excel/orders.json')
     lines = json.load(f)
-
     url = "https://api.ssactivewear.com/v2/orders/"
 
-    payload = json.dumps({
+    payload = {
         "shippingAddress": {
-            "customer": "Company ABC",
-            "attn": "John Doe",
-            "address": "123 Main St",
-            "city": "Bolingbrook",
-            "state": "IL",
-            "zip": "60440",
-            "residential": True
+            "customer": "Dolphin Shirt Company",
+            "attn": "ONLINE - ORDER APP",
+            "address": "757 Buckley Road, Ste. C",
+            "city": "San Luis Obispo",
+            "state": "CA",
+            "zip": "93401",
+            "residential": "false"
         },
         "shippingMethod": "1",
-        "shipBlind": False,
+        "shipBlind": "false",
         "poNumber": "Online Test",
-        "RejectLineErrors": "false",
         "emailConfirmation": "aforkbends@gmail.com",
-        "rejectLineErrors_Email": "true",
-        "testOrder": True,
-        "autoselectWarehouse": True,
+        "rejectLineErrors_Email": "false",
+        "testOrder": "true",
+        "RejectLineErrors": "false",
+        "autoselectWarehouse": "true",
+        "autoselectWarehouse_Warehouses": "NV,TX",
         "lines": lines
-    })
+    }
+    json_payload = json.dumps(payload)
     headers = {
-        'Authorization': 'Basic ' + config.ssa_api_key,
         'Content-Type': 'application/json',
         'Cookie': '__cf_bm=_BOX3o_owW3dCpquJ8apGRYK0MUxc9DXLDbylhj55qo-1655413418-0-AVqP+NDYBun21+X5wUJWXech2e6q/YYoKCVhAhozg1Zrq93i49AF0Vu+DzOOjzvYBnadIyN0he92Ob3MVROG/bnVYnFkUxX2aqZiQYSGdBBw'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+    print(payload)
+    response = requests.request("POST", url, headers=headers, data=json_payload,
+                                auth=HTTPBasicAuth(config.ssa_user, config.ssa_api_key))
 
     print(response.text)
 
@@ -165,10 +167,24 @@ def order_app():
             flash("Orders downloaded!", "success")
         if "convert" in request.form:
             ConvertOrders()
+            flash("Orders converted!", "success")
         if "submit" in request.form:
             submitOrder()
+            flash("Order submitted!", "success")
     return render_template("public/templates/index.html")
 
+
+# Editable dataframe for adjusting quantities
+@app.route('/edit', methods=["GET", "POST"])
+def edit_quantities():
+    edit_frame = pd.read_excel("static/excel/Activewear Upload.xlsx")
+    edit_frame.drop(
+        ['ID', 'ProfileID', 'SiteListingID', 'OrderID', 'Attribute1Name', 'Unnamed: 0'],
+        axis=1, inplace=True)
+    edit_frame["New Quantities"] = ""
+    edit_frame.reset_index(drop=True, inplace=True)
+    edit_frame.style.format('<input name="edit_frame" type="text" value="{}" />').render()
+    return render_template("public/templates/edit.html", tables=[edit_frame.to_html(classes='data table table-dark table-hover')], titles=edit_frame.columns.values)
 
 # Handler for excel file uploads or whatever else
 @app.route('/upload-excel', methods=["GET", "POST"])

@@ -1,0 +1,17 @@
+{%  extends "public/templates/public_template.html" %}
+
+{% block title %}Get Orders{%  endblock %}
+  <div id="main">{% block main %}</div>
+  <div class ="container">
+        <!-- DATAFRAME --!>
+       <form action="/" method="POST" name="refresh" id="refresh">
+           {% for table in tables %}
+            {{titles[loop.index]}}
+            {{ table|safe }}
+        {% endfor %}
+
+       </form>
+  </div>
+  <script src="../../../static/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+{% endblock %}

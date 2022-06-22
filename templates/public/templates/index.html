@@ -1,4 +1,4 @@
-{%  extends "public/templates/public_template.html" %}
+{% extends "public/templates/public_template.html" %}
 
 {% block title %}Get Orders{%  endblock %}
   <div id="main">{% block main %}</div>
@@ -9,16 +9,27 @@
             <button type="submit" class="btn btn-primary" name="refresh" value="refresh">Refresh Token</button>
             <hr>
             <h1>Step 2: Download Orders from ChannelAdvisor</h1>
-            <p>Click this button to download orders from ChannelAdvisor </p>
+           <p>Click this button to download orders from ChannelAdvisor.</p>
             <button type="submit" class="btn btn-primary" name="download" value="download">Get Orders</button>
+            <br>
+            <p>Once this process is complete, you can <a href="static/excel/Activewear Upload.xlsx">download the excel file</a>, edit the quantities, and then reupload:
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary" type="button">Upload</button>
+              </div>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="inputGroupFile03">
+                <label class="custom-file-label" for="inputGroupFile03">Choose file</label>
+              </div>
+            </div>
             <hr>
             <h1>Step 3: Convert Orders to S&S SKUs</h1>
             <p>Click this button to convert orders to S&S format</p>
-            <button type="submit" class="btn btn-primary" name="convert" value="convert">Get Orders</button>
+            <button type="submit" class="btn btn-primary" name="convert" value="convert">Convert Orders</button>
             <hr>
             <h1>Step 4: Submit Order</h1>
             <p>Click this button to submit your order</p>
-            <button type="submit" class="btn btn-primary" name="submit-order" value="submit-order">Get Orders</button>
+            <button type="submit" class="btn btn-primary" name="submit-order" value="submit-order">Submit Orders</button>
        </form>
   </div>
   <script src="../../../static/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
