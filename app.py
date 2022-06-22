@@ -88,7 +88,7 @@ def getOrders():
          'GiftTaxPrice', 'IsBundle', 'ItemURL', 'HarmonizedCode'], axis=1, inplace=True)
     unshipped_skus.to_excel("ID data.xlsx", sheet_name="Sheet1")
 
-    # Loads entire ChannelAdvisor inventory and merges based on SKU. Outputs to Activewear Upload.xlsx
+    # Loads entire ChannelAdvisor inventory and merges based on SKU. Outputs to Activewear_Upload.xlsx
     chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
     activewear_skus = pd.merge(unshipped_skus, chad_inv, how='left', on='Sku')
     print(activewear_skus)
@@ -97,7 +97,7 @@ def getOrders():
 
 # Converts orders to JSON which SSActivewear can read
 def ConvertOrders():
-    df = pd.read_excel('static/excel/Activewear Upload.xlsx')
+    df = pd.read_excel('static/excel/Activewear_Upload.xlsx')
 
     # Drops all rows that have no ActiveWear SKU and extraneous columns
     df2 = df.dropna(subset=['Attribute1Value'])
@@ -182,7 +182,7 @@ def order_app():
                 print("File extension is not allowed")
                 return redirect(request.url)
             else:
-                filename = secure_filename("Activewear Upload.xlsx")
+                filename = secure_filename("Activewear_Upload.xlsx")
                 activewear_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
             flash("Activewear Excel File Saved!", "success")
             return redirect(request.url)
@@ -193,7 +193,7 @@ def order_app():
 # Editable dataframe for adjusting quantities
 @app.route('/edit', methods=["GET", "POST"])
 def edit_quantities():
-    edit_frame = pd.read_excel("static/excel/Activewear Upload.xlsx")
+    edit_frame = pd.read_excel("static/excel/Activewear_Upload.xlsx")
     edit_frame.drop(
         ['ID', 'ProfileID', 'SiteListingID', 'OrderID', 'Attribute1Name', 'Unnamed: 0'],
         axis=1, inplace=True)
