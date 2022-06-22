@@ -92,7 +92,7 @@ def getOrders():
     chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
     activewear_skus = pd.merge(unshipped_skus, chad_inv, how='left', on='Sku')
     print(activewear_skus)
-    activewear_skus.to_excel("static/excel/Activewear Upload.xlsx", sheet_name="Sheet1")
+    activewear_skus.to_excel("static/excel/Activewear_Upload.xlsx", sheet_name="Sheet1")
 
 
 # Converts orders to JSON which SSActivewear can read
@@ -182,7 +182,7 @@ def order_app():
                 print("File extension is not allowed")
                 return redirect(request.url)
             else:
-                filename = secure_filename(activewear_excel.filename)
+                filename = secure_filename("Activewear Upload.xlsx")
                 activewear_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
             flash("Activewear Excel File Saved!", "success")
             return redirect(request.url)
