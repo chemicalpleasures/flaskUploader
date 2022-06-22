@@ -1,8 +1,6 @@
 from flask import Flask, render_template, flash, request, redirect, send_from_directory, abort
 import os
 from werkzeug.utils import secure_filename
-import config
-import config2
 import pandas as pd
 import base64
 import requests
