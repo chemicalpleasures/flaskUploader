@@ -9,7 +9,7 @@ import json
 import openpyxl
 
 app = Flask(__name__)
-app.secret_key = config.SECRET_KEY
+app.secret_key = os.environ['SECRET_KEY']
 
 
 # Specifies allowed filetypes (see environment vars)
@@ -17,7 +17,7 @@ def allowed_excel(filename):
     if not "." in filename:
         return False
     ext = filename.rsplit(".", 1)[1]
-    if ext.upper() in config.ALLOWED_EXTENSIONS:
+    if ext.upper() in os.environ['ALLOWED_EXTENSIONS']:
         return True
     else:
         return False
@@ -27,10 +27,10 @@ def allowed_excel(filename):
 def refresh_token():
     url = "https://api.channeladvisor.com/oauth2/token"
 
-    auth_str = '{}:{}'.format(config.app_id, config.shared_secret)
+    auth_str = '{}:{}'.format(os.environ['app_id'], os.environ['shared_secret'])
     b64_auth_str = base64.urlsafe_b64encode(auth_str.encode()).decode()
 
-    payload = 'grant_type=refresh_token&refresh_token=' + config.refresh_token
+    payload = 'grant_type=refresh_token&refresh_token=' + os.environ['refresh_token']
     headers = {
         'Authorization': 'Basic ' + b64_auth_str,
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -150,7 +150,7 @@ def submitOrder():
 
     print(payload)
     response = requests.request("POST", url, headers=headers, data=json_payload,
-                                auth=HTTPBasicAuth(config.ssa_user, config.ssa_api_key))
+                                auth=HTTPBasicAuth(os.environ['ssa_user'], os.environ['ssa_api_key']))
 
     print(response.text)
 
@@ -181,7 +181,7 @@ def order_app():
                 return redirect(request.url)
             else:
                 filename = secure_filename("Activewear_Upload.xlsx")
-                activewear_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+                activewear_excel.save(os.path.join(os.environ['EXCEL_UPLOADS'], filename))
             flash("Activewear Excel File Saved!", "success")
             return redirect(request.url)
 
@@ -214,7 +214,7 @@ def upload_excel():
                 return redirect(request.url)
             else:
                 filename = secure_filename(target_excel.filename)
-                target_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+                target_excel.save(os.path.join(os.environ['EXCEL_UPLOADS'], filename))
             print("Target Excel File Saved")
 
             if request.files["sals_excel"]:
@@ -227,7 +227,7 @@ def upload_excel():
                     return redirect(request.url)
                 else:
                     filename = secure_filename(sals_excel.filename)
-                    sals_excel.save(os.path.join(config.EXCEL_UPLOADS, filename))
+                    sals_excel.save(os.path.join(os.environ['EXCEL_UPLOADS'], filename))
                 print("Salsify Excel File Saved")
             return redirect(request.url)
     return render_template("public/templates/upload_excel.html")
@@ -237,7 +237,7 @@ def upload_excel():
 @app.route('/get-excel/<excel_download>')
 def get_excel(excel_download):
     try:
-        return send_from_directory(directory=config.CLIENT_EXCELS, filename=excel_download, as_attachment=False,
+        return send_from_directory(directory=os.environ['CLIENT_EXCELS'], filename=excel_download, as_attachment=False,
                                    path='/')
     except FileNotFoundError:
         abort(404)
