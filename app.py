@@ -8,6 +8,15 @@ import base64
 import requests
 import json
 import openpyxl
+import redis
+from urllib.parse import urlparse
+
+
+url = urlparse(os.environ.get("redis://:pd25e3bb55113624d2722139c886d0dea682a2f073a7aacb2f0c1a044043902ae@ec2-44-207-179-177.compute-1.amazonaws.com:9539"))
+r1 = redis.Redis(host="ec2-44-207-179-177.compute-1.amazonaws.com", port=9539, username=url.username, password=url.password, ssl=True, ssl_cert_reqs=None)
+print(r1)
+r1.set('foo', 'bar')
+r1.echo('foo')
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
