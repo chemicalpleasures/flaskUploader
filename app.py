@@ -43,6 +43,20 @@ print(response.text)
 token_json = json.loads(response.text)
 print(token_json['access_token'])
 
+def refresh_token():
+    payload = 'grant_type=refresh_token&refresh_token=' + os.environ['refresh_token']
+    headers = {
+        'Authorization': 'Basic ' + b64_auth_str,
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+    token_json = json.loads(response.text)
+    print(token_json['access_token'])
+    return token_json
+
 # f = open("config2.py", "w")
 # f.write("refreshed_token = \"" + token_json['access_token'] + "\"")
 # f.close()
