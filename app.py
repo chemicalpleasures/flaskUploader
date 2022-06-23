@@ -25,33 +25,33 @@ def allowed_excel(filename):
 
 
 # Refreshes ChannelAdvisor dev token for API
-def refresh_token():
-    url = "https://api.channeladvisor.com/oauth2/token"
 
-    auth_str = '{}:{}'.format(os.environ['app_id'], os.environ['shared_secret'])
-    b64_auth_str = base64.urlsafe_b64encode(auth_str.encode()).decode()
+url = "https://api.channeladvisor.com/oauth2/token"
 
-    payload = 'grant_type=refresh_token&refresh_token=' + os.environ['refresh_token']
-    headers = {
-        'Authorization': 'Basic ' + b64_auth_str,
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
+auth_str = '{}:{}'.format(os.environ['app_id'], os.environ['shared_secret'])
+b64_auth_str = base64.urlsafe_b64encode(auth_str.encode()).decode()
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+payload = 'grant_type=refresh_token&refresh_token=' + os.environ['refresh_token']
+headers = {
+    'Authorization': 'Basic ' + b64_auth_str,
+    'Content-Type': 'application/x-www-form-urlencoded'
+}
 
-    print(response.text)
-    token_json = json.loads(response.text)
-    print(token_json['access_token'])
+response = requests.request("POST", url, headers=headers, data=payload)
 
-    f = open("config2.py", "w")
-    f.write("refreshed_token = \"" + token_json['access_token'] + "\"")
-    f.close()
+print(response.text)
+token_json = json.loads(response.text)
+print(token_json['access_token'])
+
+# f = open("config2.py", "w")
+# f.write("refreshed_token = \"" + token_json['access_token'] + "\"")
+# f.close()
 
 
 # Main script. Gets unshipped orders from ChAd API. Output should be displayed on the page
 def getOrders():
     r = requests.get(
-        "https://api.channeladvisor.com/v1/Orders?$filter=ShippingStatus eq 'Unshipped' and ProfileID eq 32001378&access_token=" + config2.refreshed_token)
+        "https://api.channeladvisor.com/v1/Orders?$filter=ShippingStatus eq 'Unshipped' and ProfileID eq 32001378&access_token=" + token_json['access_token'])
     list_of_attributes = r.text
     attributes = json.loads(list_of_attributes)
 
@@ -70,7 +70,7 @@ def getOrders():
     def retrieveOrderItems():
         for x in order_ids:
             order_items = requests.get("https://api.channeladvisor.com/v1/Orders(" + str(
-                x) + ")/Items?$filter=ProfileID eq 32001378&access_token=" + config2.refreshed_token)
+                x) + ")/Items?$filter=ProfileID eq 32001378&access_token=" + token_json['access_token'])
             order_items_json = json.loads(order_items.text)
             order_data.append(order_items_json["value"])
         for list in order_data:
