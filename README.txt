@@ -11,4 +11,6 @@ Still needs:
 2. Editable dataframe? Or at least an download/upload link to edit qtys manually in Excel
 3. Needs invoice date
 4. Filter out accessories? Whang? Other stuff?
-5. Input box for rejectLineErrors_Email	address - variable in JSON. Or send to multiple?
+5. Input box for emailConfirmation	address - variable in JSON. Or send to multiple?
+6. Connect to Candle/Canada profiles
+7. CSV for order errors (items that are out of stock, etc) which gets emailed to willie
