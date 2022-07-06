@@ -41,9 +41,9 @@ headers = {
 
 response = requests.request("POST", url, headers=headers, data=payload)
 
-print(response.text)
+# print(response.text)
 token_json = json.loads(response.text)
-print(token_json['access_token'])
+# print(token_json['access_token'])
 
 def refresh_token():
     payload = 'grant_type=refresh_token&refresh_token=' + os.environ['refresh_token']
@@ -54,9 +54,9 @@ def refresh_token():
 
     response = requests.request("POST", url, headers=headers, data=payload)
 
-    print(response.text)
+    # print(response.text)
     token_json = json.loads(response.text)
-    print(token_json['access_token'])
+    # print(token_json['access_token'])
     return token_json
 
 # f = open("config2.py", "w")
@@ -113,7 +113,7 @@ def getOrders():
         return final_dates
 
     order_dates = getOrderDates()
-    print(order_dates)
+    # print(order_dates)
 
     # Filters response and iterates through lists to retrieve each SKU
     def retrieveOrderItems():
@@ -145,7 +145,7 @@ def getOrders():
     chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
     activewear_skus = pd.merge(order_items_dates, chad_inv, how='left', on='Sku')
     # print(activewear_skus)
-    activewear_skus.to_excel("static/excel/Activewear Upload.xlsx", sheet_name="Sheet1")
+    activewear_skus.to_excel("static/excel/Activewear_Upload.xlsx", sheet_name="Sheet1")
 
 
 # Converts orders to JSON which SSActivewear can read
@@ -203,11 +203,11 @@ def submitOrder():
         'Cookie': '__cf_bm=_BOX3o_owW3dCpquJ8apGRYK0MUxc9DXLDbylhj55qo-1655413418-0-AVqP+NDYBun21+X5wUJWXech2e6q/YYoKCVhAhozg1Zrq93i49AF0Vu+DzOOjzvYBnadIyN0he92Ob3MVROG/bnVYnFkUxX2aqZiQYSGdBBw'
     }
 
-    print(payload)
+    # print(payload)
     response = requests.request("POST", url, headers=headers, data=json_payload,
                                 auth=HTTPBasicAuth(os.environ['ssa_user'], os.environ['ssa_api_key']))
 
-    print(response.text)
+    # print(response.text)
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -218,7 +218,7 @@ def order_app():
             flash("Token refreshed!", "success")
         if "download" in request.form:
             getOrders()
-            print(request.form)
+            # print(request.form)
             flash("Orders downloaded!", "success")
         if "convert" in request.form:
             ConvertOrders()
