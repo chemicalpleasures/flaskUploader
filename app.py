@@ -76,6 +76,39 @@ def getOrders():
     order_ids = df['ID']
     order_data = []
     sku_list = []
+    from_zone = tz.gettz('UTC')
+    to_zone = tz.gettz('America/Los_Angeles')
+    date_col = []
+
+    # Grabs order dates from the Order object on ChAd, converts UTC to PT and creates a new dataframe
+
+    def getOrderDates():
+        df_dates = df[['ID', 'ImportDateUtc']]
+        df_dates.rename(columns={'ID': 'OrderID'}, inplace=True)
+        for x in df_dates['ImportDateUtc']:
+            cleaned = x.removesuffix("Z")
+            date_list = cleaned.split("T")
+            x_str = str(date_list[0] + " " + date_list[1])
+            # utc = datetime.utcnow()
+            utc = datetime.strptime(x_str, '%Y-%m-%d %H:%M:%S.%f')
+
+            # Tell the datetime object that it's in UTC time zone since
+            # datetime objects are 'naive' by default
+            utc = utc.replace(tzinfo=from_zone)
+
+            # Convert time zone
+            pst = utc.astimezone(to_zone)
+            pst = str(pst)
+            pst = pst.removesuffix('-07:00')
+            date_col.append(pst)
+        new_dates = pd.DataFrame(date_col)
+        final_dates = pd.concat([df_dates, new_dates], axis=1)
+        final_dates.rename(columns={0: 'PacificTime'}, inplace=True)
+        # print(final_dates)
+        return final_dates
+
+    order_dates = getOrderDates()
+    print(order_dates)
 
     # Filters response and iterates through lists to retrieve each SKU
     def retrieveOrderItems():
@@ -98,9 +131,14 @@ def getOrders():
          'GiftTaxPrice', 'IsBundle', 'ItemURL', 'HarmonizedCode'], axis=1, inplace=True)
     unshipped_skus.to_excel("ID data.xlsx", sheet_name="Sheet1")
 
+    # Join unshipped order items with order dates created earlier
+    order_items_dates = pd.merge(unshipped_skus, order_dates, how='left', on='OrderID')
+    # print(order_items_dates)
+    order_items_dates.to_excel('orderitemsdates.xlsx')
+
     # Loads entire ChannelAdvisor inventory and merges based on SKU. Outputs to Activewear Upload.xlsx
     chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
-    activewear_skus = pd.merge(unshipped_skus, chad_inv, how='left', on='Sku')
+    activewear_skus = pd.merge(order_items_dates, chad_inv, how='left', on='Sku')
     print(activewear_skus)
     activewear_skus.to_excel("static/excel/Activewear Upload.xlsx", sheet_name="Sheet1")
 
