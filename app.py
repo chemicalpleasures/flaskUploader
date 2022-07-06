@@ -138,13 +138,12 @@ def getOrders():
 
     # Join unshipped order items with order dates created earlier
     order_items_dates = pd.merge(unshipped_skus, order_dates, how='left', on='OrderID')
-    # print(order_items_dates)
-    order_items_dates.to_excel('orderitemsdates.xlsx')
+    print(order_items_dates)
 
     # Loads entire ChannelAdvisor inventory and merges based on SKU. Outputs to Activewear Upload.xlsx
     chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
     activewear_skus = pd.merge(order_items_dates, chad_inv, how='left', on='Sku')
-    # print(activewear_skus)
+    print(activewear_skus)
     activewear_skus.to_excel("static/excel/Activewear_Upload.xlsx", sheet_name="Sheet1")
 
 
