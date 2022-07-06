@@ -145,7 +145,7 @@ def getOrders():
     chad_inv = pd.read_excel('static/excel/chad_inv.xlsx')
     activewear_skus = pd.merge(order_items_dates, chad_inv, how='left', on='Sku')
     # print(activewear_skus)
-    activewear_skus.to_excel("Activewear Upload.xlsx", sheet_name="Sheet1")
+    activewear_skus.to_excel("static/excel/Activewear Upload.xlsx", sheet_name="Sheet1")
 
 
 # Converts orders to JSON which SSActivewear can read
