@@ -43,6 +43,8 @@ response = requests.request("POST", url, headers=headers, data=payload)
 
 # print(response.text)
 token_json = json.loads(response.text)
+
+
 # print(token_json['access_token'])
 
 def refresh_token():
@@ -59,6 +61,7 @@ def refresh_token():
     # print(token_json['access_token'])
     return token_json
 
+
 # f = open("config2.py", "w")
 # f.write("refreshed_token = \"" + token_json['access_token'] + "\"")
 # f.close()
@@ -67,7 +70,8 @@ def refresh_token():
 # Main script. Gets unshipped orders from ChAd API. Output should be displayed on the page
 def getOrders():
     r = requests.get(
-        "https://api.channeladvisor.com/v1/Orders?$filter=ShippingStatus eq 'Unshipped' and ProfileID eq 32001378&access_token=" + token_json['access_token'])
+        "https://api.channeladvisor.com/v1/Orders?$filter=ShippingStatus eq 'Unshipped' and ProfileID eq 32001378&access_token=" +
+        token_json['access_token'])
     list_of_attributes = r.text
     attributes = json.loads(list_of_attributes)
 
@@ -95,7 +99,7 @@ def getOrders():
             date_list = cleaned.split("T")
             x_str = str(date_list[0] + " " + date_list[1])
             # utc = datetime.utcnow()
-            utc = datetime.strptime(x_str, '%Y-%m-%d %H:%M:%S.%f')
+            utc = datetime.strptime(x_str, '%Y-%m-%d %H:%M:%S')
 
             # Tell the datetime object that it's in UTC time zone since
             # datetime objects are 'naive' by default
@@ -113,6 +117,7 @@ def getOrders():
         return final_dates
 
     order_dates = getOrderDates()
+
     # print(order_dates)
 
     # Filters response and iterates through lists to retrieve each SKU
@@ -252,7 +257,10 @@ def edit_quantities():
     edit_frame["New Quantities"] = ""
     edit_frame.reset_index(drop=True, inplace=True)
     edit_frame.style.format('<input name="edit_frame" type="text" value="{}" />').render()
-    return render_template("public/templates/edit.html", tables=[edit_frame.to_html(classes='data table table-dark table-hover')], titles=edit_frame.columns.values)
+    return render_template("public/templates/edit.html",
+                           tables=[edit_frame.to_html(classes='data table table-dark table-hover')],
+                           titles=edit_frame.columns.values)
+
 
 # Handler for excel file uploads or whatever else
 @app.route('/upload-excel', methods=["GET", "POST"])
