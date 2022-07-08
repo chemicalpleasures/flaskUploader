@@ -96,7 +96,8 @@ def getOrders():
         df_dates.rename(columns={'ID': 'OrderID'}, inplace=True)
         for x in df_dates['ImportDateUtc']:
             cleaned = x.removesuffix("Z")
-            date_list = cleaned.split("T")
+            head, sep, tail = cleaned.partition('.')
+            date_list = head.split("T")
             x_str = str(date_list[0] + " " + date_list[1])
             # utc = datetime.utcnow()
             utc = datetime.strptime(x_str, '%Y-%m-%d %H:%M:%S.%f')
