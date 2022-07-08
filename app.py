@@ -100,7 +100,7 @@ def getOrders():
             date_list = head.split("T")
             x_str = str(date_list[0] + " " + date_list[1])
             # utc = datetime.utcnow()
-            utc = datetime.strptime(x_str, '%Y-%m-%d %H:%M:%S.%f')
+            utc = datetime.strptime(x_str, '%Y-%m-%d %H:%M:%S')
 
             # Tell the datetime object that it's in UTC time zone since
             # datetime objects are 'naive' by default
