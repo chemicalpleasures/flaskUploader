@@ -49,7 +49,8 @@ def upload_excel():
                     filename = secure_filename(sals_excel.filename)
                     sals_excel.save(os.path.join(xlsx_uploads, filename))
                 print("Salsify Excel File Saved")
-            return redirect(request.url)
+                flash("Excel files uploaded!", "success")
+            return redirect('/parser')
     return render_template("public/templates/upload_excel.html")
 
 @app.route('/parser', methods=['POST', 'GET'])
@@ -116,7 +117,8 @@ def parser():
         final = unsorted.sort_values(by=['Inventory Number'])
 
         final.to_excel("static/excel_files/downloads/output.xlsx")
-
+        flash("Parsing complete!", "success")
+        redirect('static/excel/downloads/output.xlsx')
     return render_template('public/templates/parser.html')
 
 @app.route('/get-excel/<excel_download>')
