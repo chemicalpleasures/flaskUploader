@@ -8,10 +8,10 @@ import openpyxl
 xlsx_uploads = os.environ['EXCEL_UPLOADS']
 client_excels = os.environ['CLIENT_EXCELS']
 allowed_extensions = os.environ['ALLOWED_EXTENSIONS']
-app.secret_key = os.environ['SECRET_KEY']
-
 
 app = Flask(__name__)
+app.secret_key = os.environ['SECRET_KEY']
+
 
 def allowed_excel(filename):
     if not "." in filename:
@@ -22,7 +22,8 @@ def allowed_excel(filename):
     else:
         return False
 
-@app.route('/',  methods=["GET", "POST"])
+
+@app.route('/', methods=["GET", "POST"])
 def upload_excel():
     if request.method == "POST":
         if request.files["target_excel"]:
@@ -54,6 +55,7 @@ def upload_excel():
             return redirect('/parser')
     return render_template("public/templates/upload_excel.html")
 
+
 @app.route('/parser', methods=['POST', 'GET'])
 def parser():
     if request.method == "POST":
@@ -74,25 +76,25 @@ def parser():
 
         # creates condition which removes all product statuses and reasons we don't want
         cond1 = (merge["Product Status (Computed)"] == "Resourcing - Quality/Defective") | (
-                    merge["Product Status (Computed)"] == "Resourcing - Margin Too Low") | (
-                            merge["Product Status (Computed)"] == "Resourcing - Product Elevation In Progress") | (
-                            merge["Product Status (Computed)"] == "Resourcing - Vendor Relation") | (
-                            merge["Product Status (Computed)"] == "Resourcing") | (
-                            merge["Item Type"] == "Powered Riding Toys") | (
-                            merge["Reason"] == "Image might be considered to be RACY") | (
-                            merge["Reason"] == "Field may contain suggestive and/or profane language.") | (
-                            merge["Reason"] == "Illustrations/Logos are not acceptable images.") | (
-                            merge["Reason"] == "Image may be a drawing.") | (
-                            merge["Reason"] == "Image might be considered to be ADULT") | (
-                            merge["Reason"] == "Image might be considered to be SPOOF") | (
-                            merge["Reason"] == "Image might be considered to be MEDICAL") | (
-                            merge["Reason"] == "Field may reference a weapon.") | (
-                            merge["Reason"] == "Field may reference alcohol.") | (merge[
-                                                                                      "Reason"] == "Field may indicate that the item does not comply with Target's inclusive merchandising policy") | (
-                            merge["Reason"] == "This field is inherited from its parent and has errors") | (
-                            merge["Reason"] == "This field is inherited from its parent and has errors") | (
-                            merge["Reason"] == "The product was in a terminal state when the parent was versioned") | (
-                            merge["Reason"] == "This item was put into suspended state")
+                merge["Product Status (Computed)"] == "Resourcing - Margin Too Low") | (
+                        merge["Product Status (Computed)"] == "Resourcing - Product Elevation In Progress") | (
+                        merge["Product Status (Computed)"] == "Resourcing - Vendor Relation") | (
+                        merge["Product Status (Computed)"] == "Resourcing") | (
+                        merge["Item Type"] == "Powered Riding Toys") | (
+                        merge["Reason"] == "Image might be considered to be RACY") | (
+                        merge["Reason"] == "Field may contain suggestive and/or profane language.") | (
+                        merge["Reason"] == "Illustrations/Logos are not acceptable images.") | (
+                        merge["Reason"] == "Image may be a drawing.") | (
+                        merge["Reason"] == "Image might be considered to be ADULT") | (
+                        merge["Reason"] == "Image might be considered to be SPOOF") | (
+                        merge["Reason"] == "Image might be considered to be MEDICAL") | (
+                        merge["Reason"] == "Field may reference a weapon.") | (
+                        merge["Reason"] == "Field may reference alcohol.") | (merge[
+                                                                                  "Reason"] == "Field may indicate that the item does not comply with Target's inclusive merchandising policy") | (
+                        merge["Reason"] == "This field is inherited from its parent and has errors") | (
+                        merge["Reason"] == "This field is inherited from its parent and has errors") | (
+                        merge["Reason"] == "The product was in a terminal state when the parent was versioned") | (
+                        merge["Reason"] == "This item was put into suspended state")
 
         # creates condition which removes "Do Not Reorder" skus that are <= 130 qty
         cond2 = merge["Product Status (Computed)"].isin(
@@ -122,6 +124,7 @@ def parser():
         redirect('static/excel/downloads/output.xlsx')
     return render_template('public/templates/parser.html')
 
+
 @app.route('/get-excel/<excel_download>')
 def get_excel(excel_download):
     try:
@@ -129,6 +132,7 @@ def get_excel(excel_download):
     except FileNotFoundError:
         abort(404)
     return "Ready for download"
+
 
 if __name__ == '__main__':
     app.run()
