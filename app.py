@@ -8,7 +8,7 @@ import openpyxl
 xlsx_uploads = os.environ['EXCEL_UPLOADS']
 client_excels = os.environ['CLIENT_EXCELS']
 allowed_extensions = os.environ['ALLOWED_EXTENSIONS']
-app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.secret_key = os.environ['SECRET_KEY']
 
 
 app = Flask(__name__)
