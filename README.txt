@@ -1,9 +1,2 @@
-Flask Uploader/Downloader
+Target+ error parsing is a tedious daily process for our Product Launch team, requiring manual download of reports from Salsify and the Target+ portal, various VLOOKUPs comparing the two sheets and filtering. This tool solves that by joining the two sheets and automating the process using Python’s Pandas library and wrapping it in Flask for a simple web UI usable by Product Launch.
 
-This should house the Target Error Parser or any other script that requires upload/download (perhaps the Order app).
-
-Ideas:
-1. Feedback for when upload is complete
-
-
-Tutorial here: https://www.youtube.com/watch?v=QjpbWAirMWw&list=PLF2JzgCW6-YY_TZCmBrbOpgx5pSNBD0_L&index=14
