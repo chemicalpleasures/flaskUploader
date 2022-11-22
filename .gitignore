@@ -1,2 +1,4 @@
 config.py
-/static/excel_files/
+/static/excel_files/downloads/output.xlsx
+/static/excel_files/uploads/inv.xlsx
+/static/excel_files/uploads/target.xlsx
